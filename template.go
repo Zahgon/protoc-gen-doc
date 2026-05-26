@@ -1,14 +1,7 @@
 package gendoc
 
 import (
-	"encoding/json"
-	"fmt"
-	"sort"
-	"strings"
-	"unicode"
-
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/pseudomuto/protoc-gen-doc/extensions"
 	"github.com/pseudomuto/protokit"
 )
 
@@ -23,101 +16,20 @@ type Template struct {
 
 // NewTemplate creates a Template object from a set of descriptors.
 func NewTemplate(descs []*protokit.FileDescriptor, pluginOptions *PluginOptions) *Template {
-	files := make([]*File, 0, len(descs))
-
-	for _, f := range descs {
-		file := &File{
-			Name:          f.GetName(),
-			Description:   description(f.GetSyntaxComments().String()),
-			Package:       f.GetPackage(),
-			HasEnums:      len(f.Enums) > 0,
-			HasExtensions: len(f.Extensions) > 0,
-			HasMessages:   len(f.Messages) > 0,
-			HasServices:   len(f.Services) > 0,
-			Enums:         make(orderedEnums, 0, len(f.Enums)),
-			Extensions:    make(orderedExtensions, 0, len(f.Extensions)),
-			Messages:      make(orderedMessages, 0, len(f.Messages)),
-			Services:      make(orderedServices, 0, len(f.Services)),
-			Options:       mergeOptions(extractOptions(f.GetOptions()), extensions.Transform(f.OptionExtensions)),
-		}
-
-		for _, e := range f.Enums {
-			file.Enums = append(file.Enums, parseEnum(e))
-		}
-
-		for _, e := range f.Extensions {
-			file.Extensions = append(file.Extensions, parseFileExtension(e))
-		}
-
-		// Recursively add nested types from messages
-		var addFromMessage func(*protokit.Descriptor)
-		addFromMessage = func(m *protokit.Descriptor) {
-			file.Messages = append(file.Messages, parseMessage(m, pluginOptions))
-			for _, e := range m.Enums {
-				file.Enums = append(file.Enums, parseEnum(e))
-			}
-			for _, n := range m.Messages {
-				addFromMessage(n)
-			}
-		}
-		for _, m := range f.Messages {
-			addFromMessage(m)
-		}
-
-		for _, s := range f.Services {
-			file.Services = append(file.Services, parseService(s))
-		}
-
-		sort.Sort(file.Enums)
-		sort.Sort(file.Extensions)
-		sort.Sort(file.Messages)
-		sort.Sort(file.Services)
-
-		files = append(files, file)
-	}
-
-	return &Template{Files: files, Scalars: makeScalars()}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func makeScalars() []*ScalarValue {
-	var scalars []*ScalarValue
-	json.Unmarshal(scalarsJSON, &scalars)
+// Recursively add nested types from messages
 
-	return scalars
-}
+func makeScalars() []*ScalarValue { _ = "STUB: not implemented"; return nil }
 
 func mergeOptions(opts ...map[string]interface{}) map[string]interface{} {
-	out := make(map[string]interface{})
-	for _, opts := range opts {
-		for k, v := range opts {
-			if _, ok := out[k]; ok {
-				continue
-			}
-			out[k] = v
-		}
-	}
-	if len(out) == 0 {
-		return nil
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func camelCase(s string) string {
-	var result strings.Builder
-
-	words := strings.Split(s, "_")
-	for i, word := range words {
-		if i == 0 {
-			result.WriteString(strings.ToLower(word))
-		} else {
-			runes := []rune(word)
-			runes[0] = unicode.ToUpper(runes[0])
-			result.WriteString(string(runes))
-		}
-	}
-
-	return result.String()
-}
+func camelCase(s string) string { _ = "STUB: not implemented"; return "" }
 
 // CommonOptions are options common to all descriptor types.
 type commonOptions interface {
@@ -125,17 +37,8 @@ type commonOptions interface {
 }
 
 func extractOptions(opts commonOptions) map[string]interface{} {
-	out := make(map[string]interface{})
-	if opts.GetDeprecated() {
-		out["deprecated"] = true
-	}
-	switch opts := opts.(type) {
-	case *descriptor.MethodOptions:
-		if opts != nil && opts.IdempotencyLevel != nil {
-			out["idempotency_level"] = opts.IdempotencyLevel.String()
-		}
-	}
-	return out
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // File wraps all the relevant parsed info about a proto file. File objects guarantee that their top-level enums,
@@ -162,7 +65,7 @@ type File struct {
 }
 
 // Option returns the named option.
-func (f File) Option(name string) interface{} { return f.Options[name] }
+func (f File) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // FileExtension contains details about top-level extensions within a proto(2) file.
 type FileExtension struct {
@@ -201,39 +104,15 @@ type Message struct {
 }
 
 // Option returns the named option.
-func (m Message) Option(name string) interface{} { return m.Options[name] }
+func (m Message) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // FieldOptions returns all options that are set on the fields in this message.
-func (m Message) FieldOptions() []string {
-	optionSet := make(map[string]struct{})
-	for _, field := range m.Fields {
-		for option := range field.Options {
-			optionSet[option] = struct{}{}
-		}
-	}
-	if len(optionSet) == 0 {
-		return nil
-	}
-	options := make([]string, 0, len(optionSet))
-	for option := range optionSet {
-		options = append(options, option)
-	}
-	sort.Strings(options)
-	return options
-}
+func (m Message) FieldOptions() []string { _ = "STUB: not implemented"; return nil }
 
 // FieldsWithOption returns all fields that have the given option set.
 // If no single value has the option set, this returns nil.
 func (m Message) FieldsWithOption(optionName string) []*MessageField {
-	fields := make([]*MessageField, 0, len(m.Fields))
-	for _, field := range m.Fields {
-		if _, ok := field.Options[optionName]; ok {
-			fields = append(fields, field)
-		}
-	}
-	if len(fields) > 0 {
-		return fields
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -257,7 +136,7 @@ type MessageField struct {
 }
 
 // Option returns the named option.
-func (f MessageField) Option(name string) interface{} { return f.Options[name] }
+func (f MessageField) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // MessageExtension contains details about message-scoped extensions in proto(2) files.
 type MessageExtension struct {
@@ -280,39 +159,15 @@ type Enum struct {
 }
 
 // Option returns the named option.
-func (e Enum) Option(name string) interface{} { return e.Options[name] }
+func (e Enum) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // ValueOptions returns all options that are set on the values in this enum.
-func (e Enum) ValueOptions() []string {
-	optionSet := make(map[string]struct{})
-	for _, value := range e.Values {
-		for option := range value.Options {
-			optionSet[option] = struct{}{}
-		}
-	}
-	if len(optionSet) == 0 {
-		return nil
-	}
-	options := make([]string, 0, len(optionSet))
-	for option := range optionSet {
-		options = append(options, option)
-	}
-	sort.Strings(options)
-	return options
-}
+func (e Enum) ValueOptions() []string { _ = "STUB: not implemented"; return nil }
 
 // ValuesWithOption returns all values that have the given option set.
 // If no single value has the option set, this returns nil.
 func (e Enum) ValuesWithOption(optionName string) []*EnumValue {
-	values := make([]*EnumValue, 0, len(e.Values))
-	for _, value := range e.Values {
-		if _, ok := value.Options[optionName]; ok {
-			values = append(values, value)
-		}
-	}
-	if len(values) > 0 {
-		return values
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -326,7 +181,7 @@ type EnumValue struct {
 }
 
 // Option returns the named option.
-func (v EnumValue) Option(name string) interface{} { return v.Options[name] }
+func (v EnumValue) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // Service contains details about a service definition within a proto file.
 type Service struct {
@@ -340,39 +195,15 @@ type Service struct {
 }
 
 // Option returns the named option.
-func (s Service) Option(name string) interface{} { return s.Options[name] }
+func (s Service) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // MethodOptions returns all options that are set on the methods in this service.
-func (s Service) MethodOptions() []string {
-	optionSet := make(map[string]struct{})
-	for _, method := range s.Methods {
-		for option := range method.Options {
-			optionSet[option] = struct{}{}
-		}
-	}
-	if len(optionSet) == 0 {
-		return nil
-	}
-	options := make([]string, 0, len(optionSet))
-	for option := range optionSet {
-		options = append(options, option)
-	}
-	sort.Strings(options)
-	return options
-}
+func (s Service) MethodOptions() []string { _ = "STUB: not implemented"; return nil }
 
 // MethodsWithOption returns all methods that have the given option set.
 // If no single method has the option set, this returns nil.
 func (s Service) MethodsWithOption(optionName string) []*ServiceMethod {
-	methods := make([]*ServiceMethod, 0, len(s.Methods))
-	for _, method := range s.Methods {
-		if _, ok := method.Options[optionName]; ok {
-			methods = append(methods, method)
-		}
-	}
-	if len(methods) > 0 {
-		return methods
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -393,7 +224,7 @@ type ServiceMethod struct {
 }
 
 // Option returns the named option.
-func (m ServiceMethod) Option(name string) interface{} { return m.Options[name] }
+func (m ServiceMethod) Option(name string) interface{} { _ = "STUB: not implemented"; return nil }
 
 // ScalarValue contains information about scalar value types in protobuf. The common use case for this type is to know
 // which language specific type maps to the protobuf type.
@@ -412,162 +243,44 @@ type ScalarValue struct {
 	RubyType   string `json:"rubyType"`
 }
 
-func parseEnum(pe *protokit.EnumDescriptor) *Enum {
-	enum := &Enum{
-		Name:        pe.GetName(),
-		LongName:    pe.GetLongName(),
-		FullName:    pe.GetFullName(),
-		Description: description(pe.GetComments().String()),
-		Options:     mergeOptions(extractOptions(pe.GetOptions()), extensions.Transform(pe.OptionExtensions)),
-	}
-
-	for _, val := range pe.GetValues() {
-		enum.Values = append(enum.Values, &EnumValue{
-			Name:        val.GetName(),
-			Number:      fmt.Sprint(val.GetNumber()),
-			Description: description(val.GetComments().String()),
-			Options:     mergeOptions(extractOptions(val.GetOptions()), extensions.Transform(val.OptionExtensions)),
-		})
-	}
-
-	return enum
-}
+func parseEnum(pe *protokit.EnumDescriptor) *Enum { _ = "STUB: not implemented"; return nil }
 
 func parseFileExtension(pe *protokit.ExtensionDescriptor) *FileExtension {
-	t, lt, ft := parseType(pe)
-
-	return &FileExtension{
-		Name:               pe.GetName(),
-		LongName:           pe.GetLongName(),
-		FullName:           pe.GetFullName(),
-		Description:        description(pe.GetComments().String()),
-		Label:              labelName(pe.GetLabel(), pe.IsProto3(), pe.GetProto3Optional()),
-		Type:               t,
-		LongType:           lt,
-		FullType:           ft,
-		Number:             int(pe.GetNumber()),
-		DefaultValue:       pe.GetDefaultValue(),
-		ContainingType:     baseName(pe.GetExtendee()),
-		ContainingLongType: strings.TrimPrefix(pe.GetExtendee(), "."+pe.GetPackage()+"."),
-		ContainingFullType: strings.TrimPrefix(pe.GetExtendee(), "."),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func parseMessage(pm *protokit.Descriptor, pluginOptions *PluginOptions) *Message {
-	msg := &Message{
-		Name:          pm.GetName(),
-		LongName:      pm.GetLongName(),
-		FullName:      pm.GetFullName(),
-		Description:   description(pm.GetComments().String()),
-		HasExtensions: len(pm.GetExtensions()) > 0,
-		HasFields:     len(pm.GetMessageFields()) > 0,
-		HasOneofs:     len(pm.GetOneofDecl()) > 0,
-		Extensions:    make([]*MessageExtension, 0, len(pm.Extensions)),
-		Fields:        make([]*MessageField, 0, len(pm.Fields)),
-		Options:       mergeOptions(extractOptions(pm.GetOptions()), extensions.Transform(pm.OptionExtensions)),
-	}
-
-	for _, ext := range pm.Extensions {
-		msg.Extensions = append(msg.Extensions, parseMessageExtension(ext))
-	}
-
-	for _, f := range pm.Fields {
-		msg.Fields = append(msg.Fields, parseMessageField(f, pm.GetOneofDecl(), pluginOptions))
-	}
-
-	return msg
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func parseMessageExtension(pe *protokit.ExtensionDescriptor) *MessageExtension {
-	return &MessageExtension{
-		FileExtension: *parseFileExtension(pe),
-		ScopeType:     pe.GetParent().GetName(),
-		ScopeLongType: pe.GetParent().GetLongName(),
-		ScopeFullType: pe.GetParent().GetFullName(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func parseMessageField(pf *protokit.FieldDescriptor, oneofDecls []*descriptor.OneofDescriptorProto, pluginOptions *PluginOptions) *MessageField {
-	t, lt, ft := parseType(pf)
-
-	name := pf.GetName()
-	if pluginOptions.CamelCaseFields {
-		name = camelCase(name)
-	}
-
-	m := &MessageField{
-		Name:         name,
-		Description:  description(pf.GetComments().String()),
-		Label:        labelName(pf.GetLabel(), pf.IsProto3(), pf.GetProto3Optional()),
-		Type:         t,
-		LongType:     lt,
-		FullType:     ft,
-		DefaultValue: pf.GetDefaultValue(),
-		Options:      mergeOptions(extractOptions(pf.GetOptions()), extensions.Transform(pf.OptionExtensions)),
-		IsOneof:      pf.OneofIndex != nil,
-	}
-
-	if m.IsOneof {
-		m.OneofDecl = oneofDecls[pf.GetOneofIndex()].GetName()
-	}
-
-	// Check if this is a map.
-	// See https://github.com/golang/protobuf/blob/master/protoc-gen-go/descriptor/descriptor.pb.go#L1556
-	// for more information
-	if m.Label == "repeated" &&
-		strings.Contains(m.LongType, ".") &&
-		strings.HasSuffix(m.Type, "Entry") &&
-		strings.HasSuffix(m.LongType, "Entry") &&
-		strings.HasSuffix(m.FullType, "Entry") {
-		m.IsMap = true
-	}
-
-	return m
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func parseService(ps *protokit.ServiceDescriptor) *Service {
-	service := &Service{
-		Name:        ps.GetName(),
-		LongName:    ps.GetLongName(),
-		FullName:    ps.GetFullName(),
-		Description: description(ps.GetComments().String()),
-		Options:     mergeOptions(extractOptions(ps.GetOptions()), extensions.Transform(ps.OptionExtensions)),
-	}
+// Check if this is a map.
+// See https://github.com/golang/protobuf/blob/master/protoc-gen-go/descriptor/descriptor.pb.go#L1556
+// for more information
 
-	for _, sm := range ps.Methods {
-		service.Methods = append(service.Methods, parseServiceMethod(sm))
-	}
-
-	return service
-}
+func parseService(ps *protokit.ServiceDescriptor) *Service { _ = "STUB: not implemented"; return nil }
 
 func parseServiceMethod(pm *protokit.MethodDescriptor) *ServiceMethod {
-	return &ServiceMethod{
-		Name:              pm.GetName(),
-		Description:       description(pm.GetComments().String()),
-		RequestType:       baseName(pm.GetInputType()),
-		RequestLongType:   strings.TrimPrefix(pm.GetInputType(), "."+pm.GetPackage()+"."),
-		RequestFullType:   strings.TrimPrefix(pm.GetInputType(), "."),
-		RequestStreaming:  pm.GetClientStreaming(),
-		ResponseType:      baseName(pm.GetOutputType()),
-		ResponseLongType:  strings.TrimPrefix(pm.GetOutputType(), "."+pm.GetPackage()+"."),
-		ResponseFullType:  strings.TrimPrefix(pm.GetOutputType(), "."),
-		ResponseStreaming: pm.GetServerStreaming(),
-		Options:           mergeOptions(extractOptions(pm.GetOptions()), extensions.Transform(pm.OptionExtensions)),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func baseName(name string) string {
-	parts := strings.Split(name, ".")
-	return parts[len(parts)-1]
-}
+func baseName(name string) string { _ = "STUB: not implemented"; return "" }
 
 func labelName(lbl descriptor.FieldDescriptorProto_Label, proto3 bool, proto3Opt bool) string {
-	if proto3 && !proto3Opt && lbl != descriptor.FieldDescriptorProto_LABEL_REPEATED {
-		return ""
-	}
-
-	return strings.ToLower(strings.TrimPrefix(lbl.String(), "LABEL_"))
+	_ = "STUB: not implemented"
+	return ""
 }
 
 type typeContainer interface {
@@ -577,46 +290,32 @@ type typeContainer interface {
 }
 
 func parseType(tc typeContainer) (string, string, string) {
-	name := tc.GetTypeName()
-
-	if strings.HasPrefix(name, ".") {
-		name = strings.TrimPrefix(name, ".")
-		return baseName(name), strings.TrimPrefix(name, tc.GetPackage()+"."), name
-	}
-
-	name = strings.ToLower(strings.TrimPrefix(tc.GetType().String(), "TYPE_"))
-	return name, name, name
+	_ = "STUB: not implemented"
+	return "", "", ""
 }
 
-func description(comment string) string {
-	val := strings.TrimLeft(comment, "*/\n ")
-	if strings.HasPrefix(val, "@exclude") {
-		return ""
-	}
-
-	return val
-}
+func description(comment string) string { _ = "STUB: not implemented"; return "" }
 
 type orderedEnums []*Enum
 
-func (oe orderedEnums) Len() int           { return len(oe) }
-func (oe orderedEnums) Swap(i, j int)      { oe[i], oe[j] = oe[j], oe[i] }
-func (oe orderedEnums) Less(i, j int) bool { return oe[i].LongName < oe[j].LongName }
+func (oe orderedEnums) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (oe orderedEnums) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (oe orderedEnums) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 type orderedExtensions []*FileExtension
 
-func (oe orderedExtensions) Len() int           { return len(oe) }
-func (oe orderedExtensions) Swap(i, j int)      { oe[i], oe[j] = oe[j], oe[i] }
-func (oe orderedExtensions) Less(i, j int) bool { return oe[i].LongName < oe[j].LongName }
+func (oe orderedExtensions) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (oe orderedExtensions) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (oe orderedExtensions) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 type orderedMessages []*Message
 
-func (om orderedMessages) Len() int           { return len(om) }
-func (om orderedMessages) Swap(i, j int)      { om[i], om[j] = om[j], om[i] }
-func (om orderedMessages) Less(i, j int) bool { return om[i].LongName < om[j].LongName }
+func (om orderedMessages) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (om orderedMessages) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (om orderedMessages) Less(i, j int) bool { _ = "STUB: not implemented"; return false }
 
 type orderedServices []*Service
 
-func (os orderedServices) Len() int           { return len(os) }
-func (os orderedServices) Swap(i, j int)      { os[i], os[j] = os[j], os[i] }
-func (os orderedServices) Less(i, j int) bool { return os[i].LongName < os[j].LongName }
+func (os orderedServices) Len() int           { _ = "STUB: not implemented"; return 0 }
+func (os orderedServices) Swap(i, j int)      { _ = "STUB: not implemented"; return }
+func (os orderedServices) Less(i, j int) bool { _ = "STUB: not implemented"; return false }

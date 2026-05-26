@@ -2,10 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io"
-
-	gendoc "github.com/pseudomuto/protoc-gen-doc"
 )
 
 const helpMessage = `
@@ -28,9 +25,7 @@ See https://github.com/pseudomuto/protoc-gen-doc for more details.
 `
 
 // Version returns the currently running version of protoc-gen-doc
-func Version() string {
-	return gendoc.VERSION
-}
+func Version() string { _ = "STUB: not implemented"; return "" }
 
 // Flags contains details about the CLI invocation of protoc-gen-doc
 type Flags struct {
@@ -43,59 +38,29 @@ type Flags struct {
 }
 
 // Code returns the status code to exit with after handling the supplied flags
-func (f *Flags) Code() int {
-	if f.err != nil {
-		return 1
-	}
-
-	return 0
-}
+func (f *Flags) Code() int { _ = "STUB: not implemented"; return 0 }
 
 // HasMatch returns whether or not the supplied args are matches. For example, passing `--help` will match, or some
 // unknown parameter, but passing nothing will not.
-func (f *Flags) HasMatch() bool {
-	return f.ShowHelp() || f.ShowVersion()
-}
+func (f *Flags) HasMatch() bool { _ = "STUB: not implemented"; return false }
 
 // ShowHelp determines whether or not to show the help message
-func (f *Flags) ShowHelp() bool {
-	return f.err != nil || f.showHelp
-}
+func (f *Flags) ShowHelp() bool { _ = "STUB: not implemented"; return false }
 
 // ShowVersion determines whether or not to show the version message
-func (f *Flags) ShowVersion() bool {
-	return f.showVersion
-}
+func (f *Flags) ShowVersion() bool { _ = "STUB: not implemented"; return false }
 
 // PrintHelp prints the usage string including all flags to the `io.Writer` that was supplied to the `Flags` object.
-func (f *Flags) PrintHelp() {
-	fmt.Fprintf(f.writer, "Usage of %s:\n", f.appName)
-	fmt.Fprintf(f.writer, "%s\n", helpMessage)
-	fmt.Fprintf(f.writer, "FLAGS\n")
-	f.flagSet.PrintDefaults()
-}
+func (f *Flags) PrintHelp() { _ = "STUB: not implemented"; return }
 
 // PrintVersion prints the version string to the `io.Writer` that was supplied to the `Flags` object.
-func (f *Flags) PrintVersion() {
-	fmt.Fprintf(f.writer, "%s version %s\n", f.appName, Version())
-}
+func (f *Flags) PrintVersion() { _ = "STUB: not implemented"; return }
 
 // ParseFlags parses the supplied options are returns a `Flags` object to the caller.
 //
 // Parameters:
-//   * `w` - the `io.Writer` to use for printing messages (help, version, etc.)
-//   * `args` - the set of args the program was invoked with (typically `os.Args`)
-func ParseFlags(w io.Writer, args []string) *Flags {
-	f := Flags{appName: args[0], writer: w}
+//   - `w` - the `io.Writer` to use for printing messages (help, version, etc.)
+//   - `args` - the set of args the program was invoked with (typically `os.Args`)
+func ParseFlags(w io.Writer, args []string) *Flags { _ = "STUB: not implemented"; return nil }
 
-	f.flagSet = flag.NewFlagSet(args[0], flag.ContinueOnError)
-	f.flagSet.BoolVar(&f.showHelp, "help", false, "Show this help message")
-	f.flagSet.BoolVar(&f.showVersion, "version", false, fmt.Sprintf("Print the current version (%v)", Version()))
-	f.flagSet.SetOutput(w)
-
-	// prevent showing help on parse error
-	f.flagSet.Usage = func() {}
-
-	f.err = f.flagSet.Parse(args[1:])
-	return &f
-}
+// prevent showing help on parse error

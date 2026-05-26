@@ -1,8 +1,6 @@
 package extensions
 
 import (
-	"net/http"
-
 	"github.com/pseudomuto/protoc-gen-doc/extensions"
 	"google.golang.org/genproto/googleapis/api/annotations"
 )
@@ -20,29 +18,8 @@ type HTTPExtension struct {
 }
 
 func getRule(r *annotations.HttpRule) (rule HTTPRule) {
-	switch r.GetPattern().(type) {
-	case *annotations.HttpRule_Get:
-		rule.Method = http.MethodGet
-		rule.Pattern = r.GetGet()
-	case *annotations.HttpRule_Put:
-		rule.Method = http.MethodPut
-		rule.Pattern = r.GetPut()
-	case *annotations.HttpRule_Post:
-		rule.Method = http.MethodPost
-		rule.Pattern = r.GetPost()
-	case *annotations.HttpRule_Delete:
-		rule.Method = http.MethodDelete
-		rule.Pattern = r.GetDelete()
-	case *annotations.HttpRule_Patch:
-		rule.Method = http.MethodPatch
-		rule.Pattern = r.GetPatch()
-	case *annotations.HttpRule_Custom:
-		custom := r.GetCustom()
-		rule.Method = custom.GetKind()
-		rule.Pattern = custom.GetPath()
-	}
-	rule.Body = r.GetBody()
-	return
+	_ = "STUB: not implemented"
+	return *new(HTTPRule)
 }
 
 func init() {

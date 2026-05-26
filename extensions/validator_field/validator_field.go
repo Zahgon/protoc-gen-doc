@@ -1,10 +1,6 @@
 package extensions
 
 import (
-	"encoding/json"
-	"reflect"
-	"strings"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	validator "github.com/mwitkow/go-proto-validators"
@@ -39,38 +35,14 @@ type ValidatorExtension struct {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (v ValidatorExtension) MarshalJSON() ([]byte, error) { return json.Marshal(v.Rules()) }
+func (v ValidatorExtension) MarshalJSON() ([]byte, error) {
+	_ = "STUB: not implemented"
+	return nil, nil
 
-// Rules returns all active rules
-func (v ValidatorExtension) Rules() []ValidatorRule {
-	if v.FieldValidator == nil {
-		return nil
-	}
-	if v.rules != nil {
-		return v.rules
-	}
-	vv := reflect.ValueOf(*v.FieldValidator)
-	vt := vv.Type()
-	for i := 0; i < vt.NumField(); i++ {
-		tag, ok := vt.Field(i).Tag.Lookup("protobuf")
-		if !ok {
-			continue
-		}
-		for _, opt := range strings.Split(tag, ",") {
-			if strings.HasPrefix(opt, "name=") {
-				tag = strings.TrimPrefix(opt, "name=")
-				break
-			}
-		}
-		value := vv.Field(i)
-		if value.IsNil() {
-			continue
-		}
-		value = reflect.Indirect(value)
-		v.rules = append(v.rules, ValidatorRule{Name: tag, Value: value.Interface()})
-	}
-	return v.rules
+	// Rules returns all active rules
 }
+
+func (v ValidatorExtension) Rules() []ValidatorRule { _ = "STUB: not implemented"; return nil }
 
 func init() {
 	extensions.SetTransformer("validator.field", func(payload interface{}) interface{} {

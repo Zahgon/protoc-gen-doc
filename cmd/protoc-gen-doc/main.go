@@ -4,11 +4,11 @@
 //
 // Example: generate HTML documentation
 //
-//     protoc --doc_out=. --doc_opt=html,index.html protos/*.proto
+//	protoc --doc_out=. --doc_opt=html,index.html protos/*.proto
 //
 // Example: use a custom template
 //
-//     protoc --doc_out=. --doc_opt=custom.tmpl,docs.txt protos/*.proto
+//	protoc --doc_out=. --doc_opt=custom.tmpl,docs.txt protos/*.proto
 //
 // For more details, check out the README at https://github.com/pseudomuto/protoc-gen-doc
 package main
@@ -36,18 +36,4 @@ func main() {
 }
 
 // HandleFlags checks if there's a match and returns true if it was "handled"
-func HandleFlags(f *Flags) bool {
-	if !f.HasMatch() {
-		return false
-	}
-
-	if f.ShowHelp() {
-		f.PrintHelp()
-	}
-
-	if f.ShowVersion() {
-		f.PrintVersion()
-	}
-
-	return true
-}
+func HandleFlags(f *Flags) bool { _ = "STUB: not implemented"; return false }
